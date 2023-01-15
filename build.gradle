@@ -1,5 +1,7 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id "com.jfrog.artifactory" version "4.31.0"
 }
 
 group 'ru.leti'
@@ -7,13 +9,53 @@ version '1.0.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://wisetask.jfrog.io/artifactory/wise-task/" // The Artifactory (preferably virtual) repository to resolve from
+        credentials {               // Optional resolver credentials (leave out to use anonymous resolution)
+            username = "dima38091@gmail.com" // Artifactory user name
+            password = "password" // Password or API Key
+        }
+    }
 }
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+artifactory {
+    publish {
+        contextUrl = 'https://wisetask.jfrog.io/artifactory/wise-task/'
+        repository {
+            repoKey = "wise-task"
+            username = "dima38091@gmail.com"
+            password = "password"
+        }
+        defaults {
+            publications('mavenJava')
+            publishArtifacts = true
+            // Properties to be attached to the published artifacts.
+            properties = ['qa.level': 'basic', 'dev.team' : 'core']
+            // Publish generated POM files to Artifactory (true by default)
+            publishPom = true
+        }
+    }
 }
