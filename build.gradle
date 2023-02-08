@@ -10,10 +10,10 @@ version '1.0.0'
 repositories {
     mavenCentral()
     maven {
-        url "https://wisetask.jfrog.io/artifactory/wise-task/" // The Artifactory (preferably virtual) repository to resolve from
-        credentials {               // Optional resolver credentials (leave out to use anonymous resolution)
-            username = "dima38091@gmail.com" // Artifactory user name
-            password = "password" // Password or API Key
+        url = uri("https://maven.pkg.github.com/Terross/wise-task-library")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
         }
     }
 }
@@ -34,28 +34,19 @@ test {
 }
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Terross/wise-task-library")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
         }
     }
-}
-
-artifactory {
-    publish {
-        contextUrl = 'https://wisetask.jfrog.io/artifactory/wise-task/'
-        repository {
-            repoKey = "wise-task"
-            username = "dima38091@gmail.com"
-            password = "password"
-        }
-        defaults {
-            publications('mavenJava')
-            publishArtifacts = true
-            // Properties to be attached to the published artifacts.
-            properties = ['qa.level': 'basic', 'dev.team' : 'core']
-            // Publish generated POM files to Artifactory (true by default)
-            publishPom = true
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
         }
     }
 }
