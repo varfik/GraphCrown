@@ -1,11 +1,10 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id "com.jfrog.artifactory" version "4.31.0"
 }
 
 group 'ru.leti'
-version '1.0.0'
+version '1.0.1'
 
 repositories {
     mavenCentral()
