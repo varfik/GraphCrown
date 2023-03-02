@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 import static java.lang.Integer.parseInt;
 
-public class GraphFactory {
+public class FileLoader {
 
     private static final String NULL_VALUE = "null";
 
@@ -31,7 +31,7 @@ public class GraphFactory {
 
             return Graph
                     .builder()
-                    .verticesCount(verticesCount)
+                    .vertexCount(verticesCount)
                     .edgeCount(edgeCount)
                     .isDirect(isDirected)
                     .vertices(vertices)
@@ -59,8 +59,6 @@ public class GraphFactory {
                     .label(label)
                     .build();
             edges.add(edge);
-            vertices.get(source).getOutgoingEdges().add(edge);
-            vertices.get(target).getIncomingEdges().add(edge);
         }
     }
 
@@ -80,8 +78,6 @@ public class GraphFactory {
                     .label(label)
                     .xCoordinate(xCoordinate.intValue())
                     .yCoordinate(yCoordinate.intValue())
-                    .incomingEdges(new ArrayList<>())
-                    .outgoingEdges(new ArrayList<>())
                     .build());
         }
     }

@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Graph {
 
-    private int verticesCount;
+    private int vertexCount;
     private int edgeCount;
     private boolean isDirect;
     private List<Edge> edges;

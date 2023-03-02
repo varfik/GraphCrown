@@ -18,7 +18,5 @@ public class Vertex {
     private String label;
     private int xCoordinate;
     private int yCoordinate;
-    private List<Edge> incomingEdges;
-    private List<Edge> outgoingEdges;
 
 }
