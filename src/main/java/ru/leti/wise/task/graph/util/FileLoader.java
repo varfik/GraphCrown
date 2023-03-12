@@ -34,8 +34,8 @@ public class FileLoader {
                     .vertexCount(verticesCount)
                     .edgeCount(edgeCount)
                     .isDirect(isDirected)
-                    .vertices(vertices)
-                    .edges(edges)
+                    .vertexList(vertices)
+                    .edgeList(edges)
                     .build();
         } catch (Exception e) {
             //TODO: придумать нормальные ошибки при ошибке чтения графа

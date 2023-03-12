@@ -13,6 +13,6 @@ public class Graph {
     private int vertexCount;
     private int edgeCount;
     private boolean isDirect;
-    private List<Edge> edges;
-    private List<Vertex> vertices;
+    private List<Edge> edgeList;
+    private List<Vertex> vertexList;
 }
