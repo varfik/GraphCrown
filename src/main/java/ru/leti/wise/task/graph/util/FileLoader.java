@@ -20,6 +20,7 @@ import static java.lang.Integer.parseInt;
 public class FileLoader {
 
     private static final String NULL_VALUE = "null";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Graph loadGraphFromFile(String fileName) {
         try {
@@ -86,16 +87,9 @@ public class FileLoader {
                     .build());
         }
     }
-
     
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
     public static Graph loadGraphFromJson(String fileName) {
-        try {
-            InputStream is = JsonGraphLoader.class.getClassLoader().getResourceAsStream(fileName);
-            if (is == null)
-                is = new File(fileName).toURI().toURL().openStream();
-
+        try (InputStream is = new FileInputStream(fileName)) {
             JsonGraph jsonGraph = objectMapper.readValue(is, JsonGraph.class);
 
             List<Vertex> vertexList = jsonGraph.vertexList.stream()
@@ -110,7 +104,7 @@ public class FileLoader {
                     .edgeList(jsonGraph.edgeList)
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("Error while reading graph from file");
+            throw new RuntimeException("Error while reading graph from JSON file: " + e.getMessage(), e);
         }
     }
 
