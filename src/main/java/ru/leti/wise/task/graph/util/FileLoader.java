@@ -144,4 +144,5 @@ public class FileLoader {
                     .yCoordinate(yCoordinate)
                     .build();
         }
+    }
 }
