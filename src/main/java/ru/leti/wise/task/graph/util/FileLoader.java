@@ -9,10 +9,11 @@ import ru.leti.wise.task.graph.model.Graph;
 import ru.leti.wise.task.graph.model.Vertex;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.io.InputStream;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
