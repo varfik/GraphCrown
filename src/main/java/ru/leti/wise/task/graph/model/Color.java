@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Color {
 
-    GRAY("gray"),
-    RED("red"),
-    BLUE("blue"),
-    GREEN("green");
+    GRAY("GRAY"),
+    RED("RED"),
+    BLUE("BLUE"),
+    GREEN("GREEN");
     private final String value;
 }
