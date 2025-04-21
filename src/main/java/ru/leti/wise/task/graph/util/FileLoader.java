@@ -1,5 +1,8 @@
 package ru.leti.wise.task.graph.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ru.leti.wise.task.graph.model.Color;
 import ru.leti.wise.task.graph.model.Edge;
 import ru.leti.wise.task.graph.model.Graph;
@@ -9,6 +12,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.InputStream;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 
@@ -81,4 +86,62 @@ public class FileLoader {
                     .build());
         }
     }
+
+    
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static Graph loadGraphFromJson(String fileName) {
+        try {
+            InputStream is = JsonGraphLoader.class.getClassLoader().getResourceAsStream(fileName);
+            if (is == null)
+                is = new File(fileName).toURI().toURL().openStream();
+
+            JsonGraph jsonGraph = objectMapper.readValue(is, JsonGraph.class);
+
+            List<Vertex> vertexList = jsonGraph.vertexList.stream()
+                    .map(JsonVertex::toVertex)
+                    .collect(Collectors.toList());
+
+            return Graph.builder()
+                    .vertexCount(jsonGraph.vertexCount)
+                    .edgeCount(jsonGraph.edgeCount)
+                    .isDirect(jsonGraph.isDirect)
+                    .vertexList(vertexList)
+                    .edgeList(jsonGraph.edgeList)
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Error while reading graph from file");
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class JsonGraph {
+        public int vertexCount;
+        public int edgeCount;
+        public boolean isDirect;
+        public List<JsonVertex> vertexList;
+        public List<Edge> edgeList;
+        public String id;
+        public boolean isNamed;
+        public String name;
+    }
+
+    private static class JsonVertex {
+        public int id;
+        public String label;
+        public int weight;
+        public Color color;
+        public int xCoordinate;
+        public int yCoordinate;
+
+        public Vertex toVertex() {
+            return Vertex.builder()
+                    .id(id)
+                    .label(label)
+                    .weight(weight)
+                    .color(color)
+                    .xCoordinate(xCoordinate)
+                    .yCoordinate(yCoordinate)
+                    .build();
+        }
 }
