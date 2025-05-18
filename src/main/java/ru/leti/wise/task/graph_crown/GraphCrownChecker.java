@@ -1,5 +1,12 @@
 /*
  * Модуль получает граф и проверяет, является ли он графом-короной.
+ *
+ * Граф-корона (crown graph) на 2n вершинах - это полный двудольный граф K(n, n),
+ * из которого удалено совершенное паросочетание.
+ * Основные этапы алгоритма:
+ * 1. Проверка базовых условий (чётность числа вершин, число рёбер n*(n−1));
+ * 2. Проверка на двудольность и получение разбиения;
+ * 3. Проверка соответствия структуре короны
  */
 
 package ru.leti.wise.task.graph_crown;
@@ -13,25 +20,36 @@ public class GraphCrownChecker implements GraphProperty {
 
     @Override
     public boolean run(Graph graph) {
+        // Построение списка смежности графа
         Map<Integer, Set<Integer>> adjList = buildAdjacencyList(graph);
+
+        // Проверка базовых условий: четность вершин, количество ребер
         if (!checkBasicConditions(graph)) {
             return false;
         }
 
+        // Получение двудольного разбиения графа (иначе null)
         List<List<Integer>> bipartition = getBipartition(graph, adjList);
-        if (bipartition != null && bipartition.get(0).size() != bipartition.get(1).size()) {
+
+        // Если граф недвудольный, либо размеры долей не равны => не корона
+        if (bipartition != null || bipartition.get(0).size() != bipartition.get(1).size()) {
             return false;
         }
 
+        // Проверка структуры графа
         return isCrownStructure(adjList, bipartition.get(0), bipartition.get(1));
     }
 
-    // Построение списка смежности
+    // Построение списка смежности (adjacency list)
     private Map<Integer, Set<Integer>> buildAdjacencyList(Graph graph) {
         Map<Integer, Set<Integer>> adjList = new HashMap<>();
+
+        // Для каждой вершины инициализация пустого множества смежных вершин
         for (Vertex v : graph.getVertexList()) {
             adjList.put(v.getId(), new HashSet<>());
         }
+
+        // Добавление всех ребер в список смежности
         for (Edge e : graph.getEdgeList()) {
             adjList.get(e.getSource()).add(e.getTarget());
             if (!graph.isDirect()) {
@@ -45,29 +63,37 @@ public class GraphCrownChecker implements GraphProperty {
     public static List<List<Integer>> getBipartition(Graph graph, Map<Integer, Set<Integer>> adjList) {
         int n = graph.getVertexCount();
         int[] colors = new int[n];
-        Arrays.fill(colors, 0);
+        Arrays.fill(colors, 0); // 0 — не раскрашен, 1 — часть A, 2 — часть B
 
         List<Integer> partA = new ArrayList<>();
         List<Integer> partB = new ArrayList<>();
 
+        // Запуск BFS (обход в ширину) для каждой нераскрашенной вершины
         for (Vertex v : graph.getVertexList()) {
-            int startId = v.getId();
-            if (colors[startId] != 0) continue;
+            int startId = v.getId() - 1; // Получение индекса начальной вершины
+            if (colors[startId] != 0) continue; // Уже раскрашена
 
             Queue<Integer> queue = new LinkedList<>();
             queue.add(startId);
-            colors[startId] = 1;
+            colors[startId] = 1; // Стартовая вершина принадлежит доле A
 
             while (!queue.isEmpty()) {
                 int current = queue.poll();
-                if (colors[current] == 1) partA.add(current);
-                else partB.add(current);
 
-                for (int neighbor : adjList.get(current)) {
-                    if (colors[neighbor] == 0) {
-                        colors[neighbor] = 3 - colors[current];
-                        queue.add(neighbor);
-                    } else if (colors[neighbor] == colors[current]) {
+                // Сохранение вершины в соответствующую долю
+                if (colors[current] == 1) partA.add(current + 1);
+                else partB.add(current + 1);
+
+                // Обход всех соседей
+                for (int neighbor : adjList.get(current + 1)) {
+                    int neighborIndex = neighbor - 1;
+
+                    // Если соседняя вершина ещё не посещена - раскраска в противоположный цвет
+                    if (colors[neighborIndex] == 0) {
+                        colors[neighborIndex] = 3 - colors[current];
+                        queue.add(neighborIndex);
+                    } else if (colors[neighborIndex] == colors[current]) {
+                        // Если соседние вершины одного цвета — граф недвудольный
                         return null;
                     }
                 }
@@ -87,7 +113,8 @@ public class GraphCrownChecker implements GraphProperty {
         return graph.getEdgeCount() == n * (n - 1);
     }
 
-    // Проверка структуры короны (вершины, отсутствующие ребра)
+    // Проверка структуры короны
+    // Каждая вершина из A соединена со всеми из B, кроме одной, которая всегда уникальна
     private boolean isCrownStructure(Map<Integer, Set<Integer>> adjList, List<Integer> partA, List<Integer> partB) {
         int n = partA.size();
         Set<Integer> partBSet = new HashSet<>(partB);
@@ -99,18 +126,18 @@ public class GraphCrownChecker implements GraphProperty {
                 return false; // Степень вершины должна быть n-1
             }
 
-            // Поиск единственного b из partB, у которого нет связи с A
+            // Получение вершин из partB, у которых нет связи с partA
             Set<Integer> missingB = new HashSet<>(partBSet);
             missingB.removeAll(neighbors); // Разность множеств: partB \ neighbors(A)
 
             if (missingB.size() != 1) {
-                return false; // Ровно одно отсутствующее ребро
+                return false; // Должно быть ровно одно отсутствующее ребро
             }
             int missing = missingB.iterator().next();
-            int missingIndex = partB.indexOf(missing); // Поиск индекса b в partB
+            int missingIndex = partB.indexOf(missing); // Поиск в partB индекса отсуствующей вершины
 
             if (usedB[missingIndex]) {
-                return false; // Если b уже использован, граф не корона
+                return false; // Одна и та же вершина не может быть пропущена дважды
             }
             usedB[missingIndex] = true;
         }
