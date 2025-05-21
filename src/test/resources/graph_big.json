@@ -1,5 +1,5 @@
 {
-  "edgeCount": 212,
+  "edgeCount": 210,
   "edgeList": [
     {
       "color": "GRAY",
@@ -886,13 +886,6 @@
     {
       "color": "GRAY",
       "label": "",
-      "source": 15,
-      "target": 15,
-      "weight": 0
-    },
-    {
-      "color": "GRAY",
-      "label": "",
       "source": 17,
       "target": 4,
       "weight": 0
@@ -1392,13 +1385,6 @@
       "label": "",
       "source": 27,
       "target": 4,
-      "weight": 0
-    },
-    {
-      "color": "GRAY",
-      "label": "",
-      "source": 10,
-      "target": 29,
       "weight": 0
     },
     {

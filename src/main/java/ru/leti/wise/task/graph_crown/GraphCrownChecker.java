@@ -30,9 +30,12 @@ public class GraphCrownChecker implements GraphProperty {
 
         // Получение двудольного разбиения графа (иначе null)
         List<List<Integer>> bipartition = getBipartition(graph, adjList);
-
-        // Если граф недвудольный, либо размеры долей не равны => не корона
-        if (bipartition != null || bipartition.get(0).size() != bipartition.get(1).size()) {
+        // Если граф недвудольный => не корона
+        if (bipartition == null) {
+            return false;
+        }
+        // Если размеры долей не равны => не корона
+        if (bipartition.get(0).size() != bipartition.get(1).size()) {
             return false;
         }
 
@@ -68,7 +71,13 @@ public class GraphCrownChecker implements GraphProperty {
         List<Integer> partA = new ArrayList<>();
         List<Integer> partB = new ArrayList<>();
 
-        // Запуск BFS (обход в ширину) для каждой нераскрашенной вершины
+        if (n == 2) {
+            partA.add(1);
+            partB.add(2);
+            return Arrays.asList(partA, partB);
+        }
+
+            // Запуск BFS (обход в ширину) для каждой нераскрашенной вершины
         for (Vertex v : graph.getVertexList()) {
             int startId = v.getId() - 1; // Получение индекса начальной вершины
             if (colors[startId] != 0) continue; // Уже раскрашена
@@ -105,7 +114,7 @@ public class GraphCrownChecker implements GraphProperty {
     // Проверка базовых условий
     private boolean checkBasicConditions(Graph graph) {
         // Проверка, что граф содержит четное количество вершин
-        if (graph.getVertexCount() % 2 != 0) {
+        if (graph.getVertexCount() % 2 != 0 || graph.getVertexCount() == 0) {
             return false;
         }
         // Проверка, что количество ребер равно n*(n-1)
